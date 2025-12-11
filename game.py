@@ -5,6 +5,11 @@ from pipe import Pipe
 
 class Game:
     def __init__(self):
+        self.bg = pygame.transform.scale(
+        pygame.image.load("background2.png").convert(),
+        (WIN_WIDTH, WIN_HEIGHT)
+        )
+        
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.reset_round()
@@ -41,7 +46,7 @@ class Game:
             self.reset_round()
 
     def draw(self):
-        self.screen.fill((150, 200, 250))
+        self.screen.blit(self.bg, (0, 0))
 
         for p in self.pipes:
             p.draw(self.screen)

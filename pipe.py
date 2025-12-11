@@ -28,5 +28,5 @@ class Pipe:
         )
 
     def draw(self, surf):
-        pygame.draw.rect(surf, (0, 180, 0), (self.x, 0, PIPE_WIDTH, self.gap_y - PIPE_GAP//2))
-        pygame.draw.rect(surf, (0, 180, 0), (self.x, self.gap_y + PIPE_GAP//2, PIPE_WIDTH, WIN_HEIGHT))
+        pygame.draw.rect(surf, (25, 0, 51), (self.x, 0, PIPE_WIDTH, self.gap_y - PIPE_GAP//2))
+        pygame.draw.rect(surf, (25, 0, 51), (self.x, self.gap_y + PIPE_GAP//2, PIPE_WIDTH, WIN_HEIGHT))
