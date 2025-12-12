@@ -15,6 +15,9 @@ class Pipe:
         self.x = x
         self.gap_y = random.randint(130, WIN_HEIGHT - 130)
         self.passed = False
+        self.img_top = pygame.image.load("pipe_up.png").convert_alpha()
+        self.img_bottom = pygame.image.load("pipe_down.png").convert_alpha()
+
 
     def update(self):
         self.x -= PIPE_VEL
@@ -28,5 +31,12 @@ class Pipe:
         )
 
     def draw(self, surf):
-        pygame.draw.rect(surf, (25, 0, 51), (self.x, 0, PIPE_WIDTH, self.gap_y - PIPE_GAP//2))
-        pygame.draw.rect(surf, (25, 0, 51), (self.x, self.gap_y + PIPE_GAP//2, PIPE_WIDTH, WIN_HEIGHT))
+        top_height = self.gap_y - PIPE_GAP // 2
+        top_scaled = pygame.transform.scale(self.img_top, (PIPE_WIDTH, top_height))
+        surf.blit(top_scaled, (self.x, 0))
+
+        # Pipe de jos
+        bottom_height = WIN_HEIGHT - (self.gap_y + PIPE_GAP // 2)
+        bottom_scaled = pygame.transform.scale(self.img_bottom, (PIPE_WIDTH, bottom_height))
+        surf.blit(bottom_scaled, (self.x, self.gap_y + PIPE_GAP // 2))
+
