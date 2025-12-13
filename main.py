@@ -7,6 +7,7 @@ def main():
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("Arial", 28)
+    current_high_score = 0
 
     while True:
         screen.fill((140, 200, 255))
@@ -28,7 +29,9 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
-                    game = Game() 
+                    game = Game(high_score_in = current_high_score)
+                    updated_high_score = game.run()
+                    current_high_score = updated_high_score 
                     game.run()
 
                 if event.key == pygame.K_ESCAPE:

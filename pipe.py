@@ -25,10 +25,16 @@ class Pipe:
     def collides(self, bird):
         top_rect = pygame.Rect(self.x, 0, PIPE_WIDTH, self.gap_y - PIPE_GAP//2)
         bottom_rect = pygame.Rect(self.x, self.gap_y + PIPE_GAP//2, PIPE_WIDTH, WIN_HEIGHT)
-        return (
+        is_collision = (
             bird_pipe_collision(bird.x, bird.y, BIRD_RADIUS, top_rect) or
             bird_pipe_collision(bird.x, bird.y, BIRD_RADIUS, bottom_rect)
         )
+
+        scored_point = False
+        if not self.passed and self.x + PIPE_WIDTH < bird.x:
+            self.passed = True
+            scored_point = True
+        return (is_collision, scored_point)
 
     def draw(self, surf):
         top_height = self.gap_y - PIPE_GAP // 2
