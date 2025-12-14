@@ -13,8 +13,6 @@ class Bird:
 
         self.img_up = pygame.transform.scale(self.img_up, (40, 30))
         self.img_down = pygame.transform.scale(self.img_down, (40, 30))
-        self.img_up.set_colorkey((255, 255, 255))
-        self.img_down.set_colorkey((255, 255, 255))
 
     def flap(self):
         self.vel = -7

@@ -41,7 +41,6 @@ class Pipe:
         top_scaled = pygame.transform.scale(self.img_top, (PIPE_WIDTH, top_height))
         surf.blit(top_scaled, (self.x, 0))
 
-        # Pipe de jos
         bottom_height = WIN_HEIGHT - (self.gap_y + PIPE_GAP // 2)
         bottom_scaled = pygame.transform.scale(self.img_bottom, (PIPE_WIDTH, bottom_height))
         surf.blit(bottom_scaled, (self.x, self.gap_y + PIPE_GAP // 2))

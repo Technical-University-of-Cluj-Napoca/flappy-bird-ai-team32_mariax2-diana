@@ -1,14 +1,23 @@
+import math
 import pygame
 from settings import *
 from bird import Bird
 from pipe import Pipe
 
 class Game:
-    def __init__(self, high_score_in = 0):
+    def __init__(self, high_score_in = 0, mode = "manual"):
         self.bg = pygame.transform.scale(
         pygame.image.load("background2.png").convert(),
         (WIN_WIDTH, WIN_HEIGHT)
         )
+
+        self.get_ready_img = pygame.image.load("ready.png").convert_alpha()
+        self.get_ready_img = pygame.transform.scale(self.get_ready_img, (300, 100))
+        self.press_img = pygame.image.load("press.png").convert_alpha()
+        self.press_img = pygame.transform.scale(self.press_img, (200, 200))
+
+
+        self.mode = mode
         
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
@@ -40,9 +49,9 @@ class Game:
         
     def reset_round(self):
         self.bird = Bird()
-        self.pipes = [Pipe(WIN_WIDTH + 50)]
+        self.pipes = []
         self.frame = 0
-        self.game_state = "playing"
+        self.game_state = "get_ready"
         self.medal_image = None
 
     def get_medal(self, score):
@@ -57,10 +66,17 @@ class Game:
         return self.medals["none"]
 
     def spawn_pipe(self):
-        last_x = self.pipes[-1].x
-        self.pipes.append(Pipe(last_x + 200))
+        if not self.pipes:
+            self.pipes.append(Pipe(WIN_WIDTH + 50))
+        else:
+            last_x = self.pipes[-1].x
+            self.pipes.append(Pipe(last_x + 200))
 
     def update(self):
+        if self.game_state == "get_ready":
+            self.bird.y = WIN_HEIGHT // 2 + 10 * math.sin(pygame.time.get_ticks() * 0.005)
+            return
+        
         if self.game_state != "playing":
             return 
 
@@ -96,16 +112,24 @@ class Game:
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
 
-        for p in self.pipes:
-            p.draw(self.screen)
+        if self.game_state == "get_ready":
+            self.bird.draw(self.screen)
+            rect = self.get_ready_img.get_rect(midtop=(WIN_WIDTH // 2, 80))
+            self.screen.blit(self.get_ready_img, rect)
+            rect = self.press_img.get_rect(midtop =(190, 230))
+            self.screen.blit(self.press_img, rect)
 
-        self.bird.draw(self.screen)
+        elif self.game_state == "playing":
+            for p in self.pipes:
+                p.draw(self.screen)
 
-        score_text = self.score_font.render(str(self.bird.score), True, (255, 255, 255))
-        score_shadow = self.score_font.render(str(self.bird.score), True, (0, 0, 0)) 
+            self.bird.draw(self.screen)
 
-        self.screen.blit(score_shadow, (WIN_WIDTH // 2 - score_text.get_width() // 2 + 2, 10 + 2))
-        self.screen.blit(score_text, (WIN_WIDTH // 2 - score_text.get_width() // 2, 10))
+            score_text = self.score_font.render(str(self.bird.score), True, (255, 255, 255))
+            score_shadow = self.score_font.render(str(self.bird.score), True, (0, 0, 0)) 
+
+            self.screen.blit(score_shadow, (WIN_WIDTH // 2 - score_text.get_width() // 2 + 2, 10 + 2))
+            self.screen.blit(score_text, (WIN_WIDTH // 2 - score_text.get_width() // 2, 10))
 
         if self.game_state == "game_over":
             card_rect = pygame.Rect(WIN_WIDTH // 2 - 150, WIN_HEIGHT // 2 - 150, 300, 300)
@@ -140,7 +164,10 @@ class Game:
                     if e.key == pygame.K_ESCAPE:
                         return self.high_score
                     if e.key == pygame.K_SPACE:
-                        if self.bird.alive:
+                        if self.game_state == "get_ready":
+                            self.game_state = "playing"
+                            self.pipes.append(Pipe(WIN_WIDTH + 50))
+                        elif self.bird.alive and self.game_state == "playing":
                             self.bird.flap()
                         elif self.game_state == "game_over":
                             self.reset_round()
