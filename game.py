@@ -3,6 +3,8 @@ import pygame
 from settings import *
 from bird import Bird
 from pipe import Pipe
+from ai_bird import AIBird
+
 
 class Game:
     def __init__(self, high_score_in = 0, mode = "manual"):
@@ -55,7 +57,11 @@ class Game:
                 self.medals[key] = pygame.transform.scale(self.medals[key], (80, 80))
         
     def reset_round(self):
-        self.bird = Bird()
+        if self.mode=="auto":
+            self.bird=AIBird()
+        else:
+            self.bird = Bird()
+
         self.pipes = []
         self.frame = 0
         self.game_state = "get_ready"
@@ -103,6 +109,10 @@ class Game:
                 self.pipes.remove(p)
 
         if self.bird.alive:
+
+            if self.mode == "auto" and self.pipes:
+                self.bird.think(self.pipes)
+
             self.bird.update()
 
             if self.bird.y + BIRD_RADIUS >= GROUND_Y or self.bird.y < 0:
