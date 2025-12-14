@@ -42,3 +42,8 @@ class AIBird(Bird):
                 self.flap()
                 self.flap_cooldown = 10  # frames
 
+    def update(self):
+        super().update()
+        
+        if self.alive:
+            self.fitness += 1
