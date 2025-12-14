@@ -8,8 +8,15 @@ class Game:
     def __init__(self, high_score_in = 0, mode = "manual"):
         self.bg = pygame.transform.scale(
         pygame.image.load("background2.png").convert(),
-        (WIN_WIDTH, WIN_HEIGHT)
+        (WIN_WIDTH, WIN_HEIGHT-GROUND_HEIGHT)
         )
+
+        self.ground_img = pygame.image.load("ground.png").convert_alpha()
+        self.ground_img = pygame.transform.scale(
+            self.ground_img,
+            (WIN_WIDTH, GROUND_HEIGHT)
+        )
+        self.ground_x = 0
 
         self.get_ready_img = pygame.image.load("ready.png").convert_alpha()
         self.get_ready_img = pygame.transform.scale(self.get_ready_img, (300, 100))
@@ -75,11 +82,17 @@ class Game:
     def update(self):
         if self.game_state == "get_ready":
             self.bird.y = WIN_HEIGHT // 2 + 10 * math.sin(pygame.time.get_ticks() * 0.005)
+            self.ground_x -= PIPE_VEL
+            if self.ground_x <= -WIN_WIDTH:
+                self.ground_x = 0
             return
         
         if self.game_state != "playing":
             return 
 
+        self.ground_x -= PIPE_VEL
+        if self.ground_x <= -WIN_WIDTH:
+            self.ground_x = 0
         self.frame += 1
         if self.frame % 60 == 0:
             self.spawn_pipe()
@@ -92,7 +105,7 @@ class Game:
         if self.bird.alive:
             self.bird.update()
 
-            if self.bird.y > WIN_HEIGHT - 40 or self.bird.y < 0:
+            if self.bird.y + BIRD_RADIUS >= GROUND_Y or self.bird.y < 0:
                 self.bird.alive = False
 
             for p in self.pipes:
@@ -111,6 +124,7 @@ class Game:
 
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
+        self.screen.blit(self.ground_img, (0, GROUND_Y))
 
         if self.game_state == "get_ready":
             self.bird.draw(self.screen)
@@ -149,7 +163,10 @@ class Game:
             if self.medal_image:
                 medal_rect = self.medal_image.get_rect(center=(WIN_WIDTH // 2, WIN_HEIGHT // 2 - 30))
                 self.screen.blit(self.medal_image, medal_rect)
-                
+
+        self.screen.blit(self.ground_img, (self.ground_x, GROUND_Y))
+        self.screen.blit(self.ground_img, (self.ground_x + WIN_WIDTH, GROUND_Y))
+
         pygame.display.flip()
 
     def run(self):
