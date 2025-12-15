@@ -34,8 +34,11 @@ class Game:
         self.game_over_font = pygame.font.SysFont("Arial", 60, bold=True)
         self.stat_font = pygame.font.SysFont("Arial", 28)
 
-        self.high_score = high_score_in
+        self.manual_high_score = high_score_in
+        self.auto_high_score = high_score_in
         self.game_state = "menu"
+
+        self.last_moving_pipe = -1
 
         self.population = Population(size=50) if self.mode == "auto" else None
 
@@ -61,7 +64,16 @@ class Game:
 
     def spawn_pipe(self):
         last_x = self.pipes[-1].x if self.pipes else WIN_WIDTH
-        self.pipes.append(Pipe(last_x + 200))
+        pipe = Pipe(last_x + 200)
+        score = self.bird.score if self.mode == "manual" else self.pipes_passed_gen
+        if score >= 3:
+            if self.last_moving_pipe <= 0:
+                pipe.moving = True
+                pipe.move_speed = 1.5
+                self.last_moving_pipe = 4
+                
+            self.last_moving_pipe -= 1
+        self.pipes.append(pipe)
 
 
     def update(self):
@@ -128,10 +140,11 @@ class Game:
                     if self.mode == "auto":
                         bird.fitness += 100
                         self.pipes_passed_gen = max(self.pipes_passed_gen, bird.score)
+                        self.auto_high_score = max(self.auto_high_score, self.pipes_passed_gen)
 
         if self.mode == "manual" and not self.bird.alive:
             self.game_state = "game_over"
-            self.high_score = max(self.high_score, self.bird.score)
+            self.manual_high_score = max(self.manual_high_score, self.bird.score)
             self.medal_image = self.get_medal(self.bird.score)
 
     def get_medal(self, score):
@@ -187,7 +200,7 @@ class Game:
             self.screen.blit(title, (WIN_WIDTH//2 - title.get_width()//2, WIN_HEIGHT//2 - 130))
 
             score = self.stat_font.render(f"Score: {self.bird.score}", True, (0,0,0))
-            best = self.stat_font.render(f"Best: {self.high_score}", True, (0,0,0))
+            best = self.stat_font.render(f"Best: {self.manual_high_score}", True, (0,0,0))
             self.screen.blit(score, (WIN_WIDTH//2 - score.get_width()//2, WIN_HEIGHT//2 + 50))
             self.screen.blit(best, (WIN_WIDTH//2 - best.get_width()//2, WIN_HEIGHT//2 + 90))
 
@@ -203,7 +216,10 @@ class Game:
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    return self.high_score
+                    if self.mode == "auto":
+                        return self.auto_high_score
+                    else:
+                        return self.manual_high_score
 
                 if self.mode == "manual" and e.type == pygame.KEYDOWN:
                     if e.key == pygame.K_SPACE:
@@ -216,7 +232,7 @@ class Game:
                             self.reset_round()
 
                     if e.key == pygame.K_ESCAPE:
-                        return self.high_score
+                        return self.manual_high_score
 
             self.update()
             self.draw()

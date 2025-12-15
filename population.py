@@ -41,16 +41,16 @@ class Population:
         return Brain(new_weights)
 
     def evolve(self):
-        self.calculate_fitness()
-        self.generation += 1
-        
-        new_birds = []
         
         current_best = max(self.birds, key=lambda bird: bird.fitness)
         if current_best.fitness > self.best_fitness:
             self.best_fitness = current_best.fitness
             self.best_bird = AIBird(brain=current_best.brain.copy())
-            new_birds.append(self.best_bird)
+        self.calculate_fitness()
+        self.generation += 1
+        
+        new_birds = []
+        new_birds.append(AIBird(brain=current_best.brain.copy()))
 
         while len(new_birds) < self.size:
             parent1 = self.select_parent()

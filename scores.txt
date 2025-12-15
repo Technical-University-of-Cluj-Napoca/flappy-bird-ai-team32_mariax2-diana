@@ -1,0 +1,2 @@
+manual:41
+auto:66

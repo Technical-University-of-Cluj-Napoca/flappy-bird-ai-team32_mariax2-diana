@@ -15,12 +15,22 @@ class Pipe:
         self.x = x
         self.gap_y = random.randint(130, GROUND_Y - 130)
         self.passed = False
+        self.moving = False
+        self.move_dir = 1
+        self.move_speed = 1.5
         self.img_top = pygame.image.load("pipe_up.png").convert_alpha()
         self.img_bottom = pygame.image.load("pipe_down.png").convert_alpha()
 
 
     def update(self):
         self.x -= PIPE_VEL
+        if self.moving:
+            self.gap_y += self.move_dir * self.move_speed
+
+            if self.gap_y < 100:
+                self.move_dir = 1
+            elif self.gap_y > WIN_HEIGHT - GROUND_HEIGHT - 100:
+                self.move_dir = -1
 
     def collides(self, bird):
         top_rect = pygame.Rect(self.x, 0, PIPE_WIDTH, self.gap_y - PIPE_GAP//2)

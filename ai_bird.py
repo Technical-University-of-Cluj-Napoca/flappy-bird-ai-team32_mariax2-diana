@@ -37,13 +37,9 @@ class AIBird(Bird):
             self.flap_cooldown -= 1
             return
 
-        if self.vel > 0:
-            if self.brain.decide(inputs, threshold=0.3):
-                self.flap()
-                self.flap_cooldown = 10  # frames
+        if self.brain.decide(inputs, threshold=0.3):
+            self.flap()
+            self.flap_cooldown = 10  # frames
 
     def update(self):
         super().update()
-        
-        if self.alive:
-            self.fitness += 1
