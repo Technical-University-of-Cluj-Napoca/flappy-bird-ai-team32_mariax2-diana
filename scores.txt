@@ -1,2 +1,2 @@
 manual:41
-auto:66
+auto:81
